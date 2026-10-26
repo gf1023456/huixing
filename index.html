@@ -1,111 +1,162 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#fffdf9">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>户型装修设计</title>
   <style>
-    :root{
-      --bg:#f3efe7; --paper:#f7f4ee; --panel:#fffdf9; --line:#e3dccf; --ink:#2b2824; --muted:#8a8174;
-      --accent:#b5653a; --accent-soft:#f3e3d8; --teal:#2f5d62;
-      --danger:#b3372a;
-      --shadow: rgba(40,30,20,.14);
+    :root {
+      --bg: #f3efe7;
+      --panel: #fffdf9;
+      --panel-2: #f7f3ee;
+      --line: #e5dccb;
+      --ink: #2b2824;
+      --muted: #8a8174;
+      --accent: #b76743;
+      --accent-soft: #f4e4d9;
+      --teal: #346365;
+      --danger: #b53a2d;
+      --shadow: rgba(34, 27, 20, 0.14);
     }
-    *{box-sizing:border-box}
-    html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:13px/1.5 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;overflow:hidden}
-    body{display:grid;grid-template-rows:44px minmax(0,1fr) 30px;}
-    button,input,select{font:inherit;color:inherit}
-    .app{display:grid;grid-template-columns:236px minmax(0,1fr) 300px;height:100%;}
-    header{grid-column:1/-1;display:flex;align-items:center;gap:8px;padding:6px 14px;background:var(--panel);border-bottom:1px solid var(--line)}
-    .brand{display:flex;flex-direction:column;line-height:1.15;margin-right:8px}
-    .brand strong{font-size:15px;letter-spacing:.5px}
-    .brand span{font-size:12px;color:var(--muted)}
-    .grp{display:flex;align-items:center;gap:2px;padding:2px;border:1px solid var(--line);border-radius:8px;background:#fff}
-    .btn{border:0;background:transparent;padding:6px 9px;border-radius:6px;cursor:pointer;white-space:nowrap}
-    .btn:hover{background:#f2ece2}
-    .btn.on{background:var(--ink);color:#fff}
-    .seg{position:relative;padding:3px}
-    .seg .btn{position:relative;z-index:1;width:82px;transition:color .35s}
-    .seg .pill{position:absolute;left:3px;top:3px;bottom:3px;width:82px;border-radius:6px;background:var(--accent);transition:transform .35s}
-    body.m3d .seg .pill{transform:translateX(84px)}
-    body.m3d .seg .btn[data-view="2d"]{color:var(--ink)}
-    body:not(.m3d) .seg .btn[data-view="3d"]{color:var(--ink)}
-    .seg .btn[data-view="2d"],body.m3d .seg .btn[data-view="3d"]{color:#fff}
-    .spacer{flex:1}
-    .toolbar,.right-actions{display:flex;align-items:center;gap:6px}
-    .status{font-size:12px;color:var(--muted)}
-    aside{background:var(--panel);overflow:auto;border-right:1px solid var(--line)}
-    aside.right{border-left:1px solid var(--line);border-right:none}
-    .lib h4{margin:0;padding:12px 14px 6px;color:var(--muted);font-size:12px;letter-spacing:1px;position:sticky;top:0;background:var(--panel);z-index:1}
-    .lib-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:0 10px 8px}
-    .item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px 6px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:grab;user-select:none;touch-action:pan-y;transition:border-color .15s,transform .15s}
-    .item svg{width:56px;height:44px;display:block}
-    .item b{font-size:12px;font-weight:500}
-    .item small{font-size:11px;color:var(--muted)}
-    .item.dragging{border-color:var(--accent);opacity:.55}
-    .hint{padding:10px 14px 16px;color:var(--muted);font-size:12px}
-    main{position:relative;overflow:hidden;background:var(--paper)}
-    #plan{width:100%;height:100%;display:block;touch-action:none;cursor:default;background:linear-gradient(#f8f4ee,#f1ebdf)}
-    #plan.panning{cursor:grabbing}
-    #plan.tool-measure{cursor:crosshair}
-    #plan.tool-demolish .wall{pointer-events:all;cursor:pointer}
-    #plan .wall{pointer-events:none}
-    #plan .furn{cursor:move}
-    .modehint{position:absolute;left:50%;top:12px;transform:translateX(-50%);background:rgba(43,40,36,.9);color:#fff;padding:5px 12px;border-radius:20px;font-size:12px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:8}
-    .modehint.show{opacity:.9}
-    .scalebar{position:absolute;left:14px;bottom:12px;background:rgba(255,253,249,.9);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:12px;pointer-events:none}
-    .scalebar .bar{height:6px;border:1.5px solid var(--ink);border-top:0;margin-top:3px}
-    #pathInfo{position:absolute;right:12px;bottom:12px;background:rgba(255,253,249,.9);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:12px;color:var(--muted);pointer-events:none;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    #fab{position:absolute;left:50%;bottom:18px;transform:translate(-50%,12px);display:flex;align-items:center;gap:4px;padding:5px;background:rgba(255,253,249,.98);border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 26px var(--shadow);opacity:0;visibility:hidden;transition:opacity .2s,transform .2s,visibility 0s linear .2s;z-index:10}
-    #fab.show{opacity:1;visibility:visible;transform:translate(-50%,0)}
-    #fab .name{padding:0 8px 0 6px;font-weight:600;max-width:9em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    #fab .btn{border:1px solid transparent}
-    .stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px 12px 0}
-    .stats div{background:#faf6ef;border-radius:8px;padding:8px}
-    .stats small{display:block;font-size:11px;color:var(--muted)}
-    .stats b{font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}
-    table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
-    td{padding:4px 2px;border-bottom:1px dashed #eee6d9}
-    td.r{text-align:right}
-    #panel section{padding:12px 16px;border-bottom:1px solid var(--line)}
-    #panel h3{margin:0 0 8px;font-size:13px}
-    #panel h3 small{color:var(--muted);font-weight:400;margin-left:6px}
-    #roomList{padding:0 10px 6px;display:grid;grid-template-columns:1fr 1fr;gap:4px}
-    #roomList button{display:flex;flex-direction:column;width:100%;border:1px solid var(--line);background:#fff;padding:5px 8px;border-radius:7px;cursor:pointer;text-align:left;line-height:1.3}
-    #roomList button.on{background:var(--accent-soft);color:var(--accent)}
-    #roomList small{color:var(--muted);font-variant-numeric:tabular-nums}
-    .form{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-    .form label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted)}
-    .form label.full{grid-column:1/-1}
-    .form input,.form select{border:1px solid var(--line);border-radius:6px;padding:5px 7px;background:#fff;width:100%}
-    .actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-    .actions .btn{border:1px solid var(--line);background:#fff}
-    .mats{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-    .mat{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:8px;padding:6px;background:#fff;cursor:pointer;text-align:left}
-    .mat.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
-    .mat i{width:26px;height:26px;border-radius:5px;border:1px solid rgba(0,0,0,.12);flex:none}
-    .mat span{font-size:12px;line-height:1.3}
-    .mat small{display:block;color:var(--muted)}
-    .flush{margin:0;padding:0;list-style:none}
-    .flush li{display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px dashed #eee6d9}
-    footer{grid-column:1/-1;display:flex;align-items:center;gap:18px;padding:0 14px;background:var(--panel);overflow:hidden;white-space:nowrap;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
-    footer b{color:var(--ink);font-weight:500}
-    #toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:8px 16px;border-radius:8px;opacity:0;transition:.25s;pointer-events:none;z-index:30}
-    #toast.show{opacity:1;transform:translateX(-50%)}
-    #view3d{position:absolute;inset:0;display:none;background:radial-gradient(circle at center,#f5f1ea,#e8e0d6);}
-    body.m3d #view3d{display:block}
-    body.m3d #plan{display:none}
-    .iso-room{position:absolute;left:50%;top:50%;transform-style:preserve-3d;transform:translate(-50%,-50%) rotateX(55deg) rotateZ(-45deg)}
-    .iso-room .floor{position:absolute;left:0;top:0;width:220px;height:170px;border:1px solid rgba(0,0,0,.15);background:rgba(240,232,220,.9)}
-    .iso-room .wall{position:absolute;border:1px solid rgba(0,0,0,.08);background:rgba(255,255,255,.4)}
-    .iso-room .f{position:absolute;width:120px;height:80px;background:rgba(196,166,141,.8);border:1px solid rgba(0,0,0,.15)}
-    .iso-room .bed{position:absolute;width:100px;height:60px;background:rgba(162,129,96,.75)}
-    .iso-room .sofa{position:absolute;width:110px;height:40px;background:rgba(116,128,165,.7)}
-    .iso-room .table{position:absolute;width:50px;height:50px;border-radius:50%;background:rgba(130,120,112,.6)}
-    .iso-room .cab{position:absolute;width:60px;height:35px;background:rgba(115,86,70,.66)}
-    .iso-room .label{position:absolute;left:10px;top:10px;font-size:12px;color:#2b2824;font-weight:700}
-    .hidden{display:none!important}
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); font: 13px/1.5 -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; overflow: hidden; }
+    body { display: grid; grid-template-rows: 52px minmax(0,1fr) 32px; }
+    button, input, select { font: inherit; color: inherit; }
+    .hidden { display: none !important; }
+
+    header {
+      display: flex; align-items: center; gap: 10px; padding: 8px 14px;
+      background: var(--panel); border-bottom: 1px solid var(--line);
+    }
+    .brand {
+      display: flex; flex-direction: column; justify-content: center; line-height: 1.15; min-width: 140px;
+    }
+    .brand strong { font-size: 15px; letter-spacing: .3px; }
+    .brand span { font-size: 11px; color: var(--muted); }
+    .seg { display: flex; gap: 0; padding: 3px; border: 1px solid var(--line); border-radius: 9px; background: #fff; }
+    .seg .btn { width: 82px; }
+    .btn {
+      appearance: none; border: 1px solid transparent; background: transparent; color: var(--ink);
+      padding: 6px 10px; border-radius: 7px; cursor: pointer; white-space: nowrap; transition: .15s ease;
+    }
+    .btn:hover { background: #f2ece4; }
+    .btn.on { background: var(--ink); color: white; }
+    .primary { background: var(--accent); color: white; }
+    .primary:hover { filter: brightness(0.98); }
+    .toolbar { display: flex; align-items: center; gap: 6px; }
+    .spacer { flex: 1; }
+
+    .app {
+      display: grid; grid-template-columns: 240px minmax(0,1fr) 300px; height: 100%;
+    }
+
+    aside {
+      background: var(--panel); border-right: 1px solid var(--line);
+      overflow: auto;
+    }
+    aside.right { border-right: none; border-left: 1px solid var(--line); }
+
+    .library { padding-bottom: 12px; }
+    .library h4 {
+      margin: 0; padding: 12px 14px 8px; font-size: 12px; letter-spacing: 1px; color: var(--muted);
+      position: sticky; top: 0; background: var(--panel); z-index: 2;
+    }
+    .library-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 10px;
+    }
+    .item {
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+      padding: 8px 4px 6px; border: 1px solid var(--line); border-radius: 9px; background: white; cursor: grab; user-select: none;
+      box-shadow: 0 2px 0 rgba(0,0,0,.015);
+    }
+    .item:active { cursor: grabbing; }
+    .item svg { width: 62px; height: 42px; display: block; }
+    .item b { font-size: 12px; font-weight: 600; }
+    .item small { font-size: 11px; color: var(--muted); }
+    .hint { margin-top: 10px; padding: 0 12px; font-size: 12px; color: var(--muted); }
+
+    main {
+      position: relative; background: var(--panel-2); overflow: hidden; border-left: 1px solid var(--line);
+    }
+    #canvas {
+      width: 100%; height: 100%; display: block; background: linear-gradient(#f9f5f0, #efe6da);
+      touch-action: none;
+    }
+    #canvas.measure { cursor: crosshair; }
+    #canvas.demolish { cursor: pointer; }
+    #canvas.select { cursor: default; }
+    .ghost {
+      position: absolute; inset: 0; display: none; pointer-events: none; z-index: 2;
+    }
+    .ghost.show { display: block; }
+    .hud {
+      position: absolute; left: 50%; top: 14px; transform: translateX(-50%);
+      background: rgba(43,40,36,.9); color: white; padding: 7px 12px; border-radius: 999px;
+      font-size: 12px; letter-spacing: .2px; opacity: 0; transition: .2s ease; z-index: 5;
+    }
+    .hud.show { opacity: .9; }
+    .fiv { position: absolute; left: 12px; bottom: 12px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: rgba(255,255,255,.9); font-size: 12px; pointer-events: none; }
+    .fiv .bar { height: 7px; border: 2px solid var(--ink); border-top: 0; margin-top: 3px; }
+    #measureText {
+      position: absolute; right: 10px; bottom: 10px; max-width: 220px; background: rgba(255,255,255,.9); border: 1px solid var(--line); border-radius: 8px; padding: 6px 9px; font-size: 12px; color: var(--muted); pointer-events: none; z-index: 4;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    #fab {
+      position: absolute; left: 50%; bottom: 14px; transform: translate(-50%, 12px); display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,.97); border: 1px solid var(--line); border-radius: 14px; padding: 5px; box-shadow: 0 8px 28px var(--shadow); opacity: 0; visibility: hidden; transition: .2s ease; z-index: 8;
+    }
+    #fab.show { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
+    #fab .name { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 8px; font-weight: 600; }
+
+    .panel-section { padding: 12px 16px; border-bottom: 1px solid var(--line); }
+    .panel-section h3 { margin: 0 0 8px; font-size: 13px; }
+    .panel-section h3 small { color: var(--muted); font-weight: 500; }
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .kpi {
+      background: #faf6ef; border-radius: 10px; padding: 8px; border: 1px solid #efe8dd;
+    }
+    .kpi small { display: block; color: var(--muted); font-size: 11px; }
+    .kpi b { display: block; margin-top: 5px; font-size: 22px; font-variant-numeric: tabular-nums; }
+    .room-list { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .room-pill {
+      width: 100%; border: 1px solid var(--line); background: white; border-radius: 8px; padding: 7px 8px; text-align: left; cursor: pointer;
+      line-height: 1.25;
+    }
+    .room-pill.on { background: var(--accent-soft); border-color: #e8c8af; color: var(--accent); }
+    .room-pill small { display: block; color: var(--muted); font-variant-numeric: tabular-nums; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
+    label.full { grid-column: 1 / -1; }
+    input, select { border: 1px solid var(--line); background: white; border-radius: 6px; padding: 6px 8px; width: 100%; }
+    .actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .thin-list { list-style: none; padding: 0; margin: 0; }
+    .thin-list li { display: flex; align-items: center; justify-content: space-between; padding: 5px 0; border-bottom: 1px dashed #e9e1d5; }
+    .material-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .mat-item {
+      display: flex; align-items: center; gap: 8px; padding: 7px 8px; border: 1px solid var(--line); border-radius: 8px; background: white; cursor: pointer; text-align: left;
+    }
+    .mat-item.on { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent-soft); background: var(--accent-soft); }
+    .mat-swatch { width: 26px; height: 26px; border: 1px solid rgba(0,0,0,.15); border-radius: 6px; flex: none; }
+    .mat-text { font-size: 12px; }
+    .mat-text small { display: block; color: var(--muted); }
+
+    footer {
+      display: flex; align-items: center; justify-content: space-between; gap: 20px;
+      background: var(--panel); border-top: 1px solid var(--line); padding: 0 16px; color: var(--muted); font-size: 12px;
+    }
+    footer b { color: var(--ink); }
+
+    #toast {
+      position: fixed; left: 50%; bottom: 88px; transform: translateX(-50%) translateY(20px); opacity: 0; transition: .2s ease; background: rgba(30, 28, 25, 0.96); color: white; padding: 8px 14px; border-radius: 10px; z-index: 30; pointer-events: none;
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    #threeWrap {
+      position: absolute; inset: 0; display: none; background: radial-gradient(circle at center, #f6f1ea 0%, #e8dfd0 100%);
+    }
+    body.view-3d #threeWrap { display: block; }
+    body.view-3d #canvas { display: none; }
+    #threeWrap canvas { width: 100%; height: 100%; display: block; }
   </style>
 </head>
 <body>
@@ -114,16 +165,19 @@
       <strong>户型装修设计</strong>
       <span>纯前端方案工具</span>
     </div>
-    <div class="grp" id="langSel">
+
+    <div class="seg" aria-label="语言切换">
       <button class="btn on" data-lang="zh">中文</button>
       <button class="btn" data-lang="en">English</button>
     </div>
+
     <div class="spacer"></div>
-    <div class="seg" aria-label="2D/3D switch">
-      <div class="pill"></div>
-      <button class="btn" type="button" data-view="2d">2D</button>
-      <button class="btn" type="button" data-view="3d">3D</button>
+
+    <div class="seg" aria-label="视图切换">
+      <button class="btn on" data-view="2d">2D</button>
+      <button class="btn" data-view="3d">3D</button>
     </div>
+
     <div class="toolbar">
       <button class="btn" data-tool="select">选择</button>
       <button class="btn" data-tool="measure">测量</button>
@@ -133,84 +187,84 @@
   </header>
 
   <div class="app">
-    <aside class="lib" id="libPanel">
+    <aside class="library">
       <h4>家具库</h4>
-      <div class="lib-grid" id="libGrid"></div>
-      <div class="hint">拖入平面图：移动、旋转、尺寸调整，Shift 锁定角度，Delete 删除</div>
+      <div class="library-grid" id="libraryGrid"></div>
+      <div class="hint">拖进平面图：移动、旋转、尺寸调整，Shift 锁定角度。</div>
     </aside>
 
     <main>
-      <svg id="plan" viewBox="0 0 1000 760" xmlns="http://www.w3.org/2000/svg"></svg>
-      <div id="view3d"></div>
-      <div id="toast"></div>
-      <div class="modehint" id="modeHint">选择模式</div>
-      <div class="scalebar"><div>1000mm</div><div class="bar"></div></div>
-      <div id="pathInfo">未测量</div>
-      <div id="fab"><span class="name" id="fabName">家具</span><button class="btn" id="rotateBtn">旋转</button><button class="btn" id="dupBtn">复制</button><button class="btn" id="deleteBtn">删除</button></div>
+      <svg id="canvas" class="select" viewBox="0 0 1000 760" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div id="threeWrap"></div>
+
+      <div id="hud" class="hud">选择模式</div>
+      <div class="fiv"><div>1000mm</div><div class="bar"></div></div>
+      <div id="measureText">未测量</div>
+
+      <div id="fab">
+        <span class="name" id="fabName">家具</span>
+        <button class="btn" id="rotateBtn">旋转</button>
+        <button class="btn" id="copyBtn">复制</button>
+        <button class="btn" id="deleteBtn">删除</button>
+      </div>
     </main>
 
-    <aside class="right" id="panel">
-      <section>
-        <h3>房间 <small>面积</small></h3>
-        <div id="roomList"></div>
-      </section>
+    <aside class="right">
+      <div class="panel-section">
+        <h3>房间 <small>列表</small></h3>
+        <div id="roomList" class="room-list"></div>
+      </div>
 
-      <section>
-        <h3>统计 <small>方案</small></h3>
-        <div class="stats">
-          <div><small>建筑面积</small><b id="statArea">0</b></div>
-          <div><small>使用面积</small><b id="statUse">0</b></div>
+      <div class="panel-section">
+        <h3>方案 <small>统计</small></h3>
+        <div class="stats-grid">
+          <div class="kpi"><small>建筑面积</small><b id="areaTotal">0</b></div>
+          <div class="kpi"><small>使用面积</small><b id="areaUsed">0</b></div>
+          <div class="kpi"><small>家具数</small><b id="furnitureCount">0</b></div>
+          <div class="kpi"><small>预算</small><b id="budgetTotal">0</b></div>
         </div>
-        <div class="stats" style="margin-top:8px">
-          <div><small>家具数</small><b id="statFurn">0</b></div>
-          <div><small>预算</small><b id="statCost">0</b></div>
-        </div>
-      </section>
+      </div>
 
-      <section>
+      <div class="panel-section">
         <h3>房间属性</h3>
-        <div class="form">
-          <label><span>地面材质</span><select id="matSelect"></select></label>
+        <div class="form-grid">
           <label><span>房间名</span><input id="roomNameInput" /></label>
-          <label class="full"><span>面积</span><input id="roomAreaInput" readonly /></label>
+          <label><span>面积</span><input id="roomAreaInput" readonly /></label>
+          <label class="full"><span>地面材质</span>
+            <div id="materialGrid" class="material-grid"></div>
+          </label>
         </div>
         <div class="actions">
           <button class="btn" id="applyRoomBtn">应用</button>
           <button class="btn" id="exportBtn">导出 JSON</button>
           <button class="btn" id="importBtn">导入 JSON</button>
         </div>
-      </section>
+      </div>
 
-      <section>
+      <div class="panel-section">
         <h3>快捷键</h3>
-        <ul class="flush">
+        <ul class="thin-list">
           <li><span>V / M / X</span><span>选择 / 测量 / 拆改</span></li>
-          <li><span>R / Shift+R</span><span>旋转</span></li>
+          <li><span>R / Shift + R</span><span>旋转</span></li>
           <li><span>Delete</span><span>删除</span></li>
-          <li><span>Ctrl/⌘ + D</span><span>复制</span></li>
-          <li><span>Ctrl/⌘ + Z</span><span>撤销</span></li>
+          <li><span>Ctrl + D</span><span>复制</span></li>
+          <li><span>Ctrl + Z</span><span>撤销</span></li>
         </ul>
-      </section>
+      </div>
     </aside>
   </div>
 
   <footer>
-    <span id="tip"><b>提示：</b> 直接拖入家具到平面图，按原始户型比例执行布置。</span>
-    <span id="statusBar">方案已保存</span>
+    <span><b>提示：</b> 直接拖入家具到平面图，并使用房间列表控制地面材质和面积统计。</span>
+    <span id="saveStatus">方案已保存</span>
   </footer>
 
-  <script>
-    const STORAGE_KEY = 'huixing-plan-v1';
-    const LANG = {
-      zh: {
-        choose:'选择', measure:'测量', demolish:'拆改', newPlan:'新方案', saved:'方案已保存', room:'房间', floor:'地面', area:'面积', rooms:'房间列表'
-      },
-      en: {
-        choose:'Select', measure:'Measure', demolish:'Demolish', newPlan:'New', saved:'Saved', room:'Room', floor:'Floor', area:'Area', rooms:'Rooms'
-      }
-    };
+  <div id="toast"></div>
 
-    const roomPolys = {
+  <script>
+    const STORAGE_KEY = 'huixing-fp-v2';
+
+    const roomPolygons = {
       '客厅': [[120,120],[710,120],[710,500],[540,500],[540,620],[250,620],[250,590],[120,590]],
       '卧室': [[120,590],[700,590],[700,760],[120,760]],
       '厨房': [[720,120],[960,120],[960,290],[720,290]],
@@ -219,388 +273,636 @@
       '阳台': [[430,620],[720,620],[720,700],[430,700]]
     };
 
-    const MATS = [
-      {id:'wood', name:'木地板', color:'#d1b48b', price:220},
-      {id:'tile', name:'地砖', color:'#b5c6d9', price:260},
-      {id:'stone', name:'大理石', color:'#d8dfe6', price:310},
-      {id:'mosaic', name:'水磨石', color:'#d9d0b9', price:240},
-      {id:'carpet', name:'地毯', color:'#d4b7bf', price:200}
-    ];
-
-    const LIB = [
-      {id:'bed', name:'双人床', type:'bed', w:180, h:200, color:'#c5a88f'},
-      {id:'sofa', name:'沙发', type:'sofa', w:220, h:90, color:'#8da6cb'},
-      {id:'table', name:'餐桌', type:'table', w:140, h:140, color:'#d5c6ae'},
-      {id:'desk', name:'书桌', type:'desk', w:150, h:80, color:'#c9b495'},
-      {id:'cabinet', name:'衣柜', type:'cabinet', w:90, h:50, color:'#9ca79d'},
-      {id:'tv', name:'电视柜', type:'cabinet', w:150, h:45, color:'#a7b3bd'},
-      {id:'toilet', name:'卫浴', type:'cabinet', w:80, h:60, color:'#dfe8e8'},
-      {id:'stove', name:'灶台', type:'cabinet', w:110, h:60, color:'#cfc5b4'}
-    ];
-
-    const ROOM_META = {
-      '客厅': {room:'客厅', mat:'wood'},
-      '卧室': {room:'卧室', mat:'tile'},
-      '厨房': {room:'厨房', mat:'stone'},
-      '书房': {room:'书房', mat:'wood'},
-      '主卧': {room:'主卧', mat:'carpet'},
-      '阳台': {room:'阳台', mat:'mosaic'}
+    const defaultMaterials = {
+      '客厅': 'wood',
+      '卧室': 'tile',
+      '厨房': 'stone',
+      '书房': 'wood',
+      '主卧': 'carpet',
+      '阳台': 'mosaic'
     };
+
+    const materials = [
+      { id: 'wood', name: '木地板', color: '#d5b78e', price: 220 },
+      { id: 'tile', name: '地砖', color: '#b7c7d9', price: 260 },
+      { id: 'stone', name: '大理石', color: '#dfe6ec', price: 310 },
+      { id: 'mosaic', name: '水磨石', color: '#d7d0be', price: 240 },
+      { id: 'carpet', name: '地毯', color: '#d5bcc3', price: 200 }
+    ];
+
+    const furnitureTemplates = [
+      { id:'bed', name:'双人床', w:185, h:210, color:'#c5a88f' },
+      { id:'sofa', name:'沙发', w:220, h:90, color:'#8fa5c5' },
+      { id:'table', name:'餐桌', w:140, h:140, color:'#d7c7ad' },
+      { id:'desk', name:'书桌', w:155, h:85, color:'#cbb896' },
+      { id:'cabinet', name:'衣柜', w:90, h:50, color:'#9aa89e' },
+      { id:'tv', name:'电视柜', w:150, h:46, color:'#a4b1ba' },
+      { id:'toilet', name:'卫浴', w:82, h:62, color:'#dfe9ea' },
+      { id:'stove', name:'灶台', w:110, h:62, color:'#d0c5b0' }
+    ];
 
     const state = {
       tool: 'select',
-      language: 'zh',
+      view: '2d',
       selectedId: null,
-      selectedRoomId: '客厅',
+      selectedRoom: '客厅',
       drag: null,
       pendingMeasure: null,
-      history: [],
-      rooms: Object.keys(roomPolys).map((roomName, idx) => ({
-        id: roomName,
-        name: roomName,
-        polygon: roomPolys[roomName],
-        material: ROOM_META[roomName].mat,
-        x: 0, y: 0
-      })),
+      rooms: Object.entries(roomPolygons).map(([id, polygon]) => ({ id, name:id, polygon, material: defaultMaterials[id] })),
       furniture: [],
-      wallSegments: [
+      walls: [
         {id:'w1', x1:120, y1:120, x2:710, y2:120},
-        {id:'w2', x1:710, y1:120, x2:710, y2:500},
-        {id:'w3', x1:710, y1:500, x2:540, y2:500},
-        {id:'w4', x1:540, y1:500, x2:540, y2:620},
-        {id:'w5', x1:540, y1:620, x2:250, y2:620},
-        {id:'w6', x1:250, y1:620, x2:250, y2:590},
-        {id:'w7', x1:250, y1:590, x2:120, y2:590},
+        {id:'w2', x1:710, y1:120, x2:710, y2:500},{id:'w3', x1:710, y1:500, x2:540, y2:500},
+        {id:'w4', x1:540, y1:500, x2:540, y2:620},{id:'w5', x1:540, y1:620, x2:250, y2:620},
+        {id:'w6', x1:250, y1:620, x2:250, y2:590},{id:'w7', x1:250, y1:590, x2:120, y2:590},
         {id:'w8', x1:120, y1:590, x2:120, y2:120},
-        {id:'w9', x1:720, y1:120, x2:960, y2:120},
-        {id:'w10', x1:960, y1:120, x2:960, y2:290},
-        {id:'w11', x1:960, y1:290, x2:720, y2:290},
-        {id:'w12', x1:720, y1:290, x2:720, y2:120},
-        {id:'w13', x1:720, y1:310, x2:960, y2:310},
-        {id:'w14', x1:960, y1:310, x2:960, y2:520},
-        {id:'w15', x1:960, y1:520, x2:720, y2:520},
-        {id:'w16', x1:720, y1:520, x2:720, y2:310},
-        {id:'w17', x1:720, y1:530, x2:960, y2:530},
-        {id:'w18', x1:960, y1:530, x2:960, y2:760},
-        {id:'w19', x1:960, y1:760, x2:720, y2:760},
-        {id:'w20', x1:720, y1:760, x2:720, y2:530},
-        {id:'w21', x1:430, y1:620, x2:720, y2:620},
-        {id:'w22', x1:720, y1:620, x2:720, y2:700},
-        {id:'w23', x1:720, y1:700, x2:430, y2:700},
-        {id:'w24', x1:430, y1:700, x2:430, y2:620}
-      ]
+        {id:'w9', x1:720, y1:120, x2:960, y2:120},{id:'w10', x1:960, y1:120, x2:960, y2:290},
+        {id:'w11', x1:960, y1:290, x2:720, y2:290},{id:'w12', x1:720, y1:290, x2:720, y2:120},
+        {id:'w13', x1:720, y1:310, x2:960, y2:310},{id:'w14', x1:960, y1:310, x2:960, y2:520},
+        {id:'w15', x1:960, y1:520, x2:720, y2:520},{id:'w16', x1:720, y1:520, x2:720, y2:310},
+        {id:'w17', x1:720, y1:530, x2:960, y2:530},{id:'w18', x1:960, y1:530, x2:960, y2:760},
+        {id:'w19', x1:960, y1:760, x2:720, y2:760},{id:'w20', x1:720, y1:760, x2:720, y2:530},
+        {id:'w21', x1:430, y1:620, x2:720, y2:620},{id:'w22', x1:720, y1:620, x2:720, y2:700},
+        {id:'w23', x1:720, y1:700, x2:430, y2:700},{id:'w24', x1:430, y1:700, x2:430, y2:620}
+      ],
+      history: []
     };
 
-    const svg = document.getElementById('plan');
-    const roomList = document.getElementById('roomList');
-    const libGrid = document.getElementById('libGrid');
-    const modeHint = document.getElementById('modeHint');
-    const toast = document.getElementById('toast');
-    const statusBar = document.getElementById('statusBar');
-    const pathInfo = document.getElementById('pathInfo');
-    const fab = document.getElementById('fab');
-    const fabName = document.getElementById('fabName');
-    const matSelect = document.getElementById('matSelect');
+    const svg = document.getElementById('canvas');
+    const roomListEl = document.getElementById('roomList');
+    const libraryGrid = document.getElementById('libraryGrid');
     const roomNameInput = document.getElementById('roomNameInput');
     const roomAreaInput = document.getElementById('roomAreaInput');
-    const statArea = document.getElementById('statArea');
-    const statUse = document.getElementById('statUse');
-    const statFurn = document.getElementById('statFurn');
-    const statCost = document.getElementById('statCost');
-    const view3d = document.getElementById('view3d');
+    const materialGrid = document.getElementById('materialGrid');
+    const areaTotal = document.getElementById('areaTotal');
+    const areaUsed = document.getElementById('areaUsed');
+    const furnitureCount = document.getElementById('furnitureCount');
+    const budgetTotal = document.getElementById('budgetTotal');
+    const saveStatus = document.getElementById('saveStatus');
+    const hud = document.getElementById('hud');
+    const measureText = document.getElementById('measureText');
+    const fab = document.getElementById('fab');
+    const fabName = document.getElementById('fabName');
+    const toast = document.getElementById('toast');
 
-    function save() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ rooms: state.rooms, furniture: state.furniture, wallSegments: state.wallSegments }));
-      statusBar.textContent = LANG[state.language].saved;
+    function randomId(prefix = 'id') {
+      return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
     }
 
-    function load() {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return;
-      try {
-        const data = JSON.parse(raw);
-        if (data.rooms) state.rooms = data.rooms;
-        if (data.furniture) state.furniture = data.furniture;
-        if (data.wallSegments) state.wallSegments = data.wallSegments;
-      } catch (e) {}
-    }
+    function clamp(value, min, max) { return Math.min(Math.max(value, min), max); }
 
-    function areaOfPolygon(poly) {
-      let area = 0;
-      for (let i=0;i<poly.length;i++) {
+    function polygonArea(poly) {
+      let sum = 0;
+      for (let i=0; i<poly.length; i++) {
         const [x1,y1] = poly[i];
         const [x2,y2] = poly[(i+1)%poly.length];
-        area += x1*y2 - x2*y1;
+        sum += x1*y2 - x2*y1;
       }
-      return Math.abs(area)/2;
+      return Math.abs(sum)/2;
     }
 
-    function showToast(text) {
-      toast.textContent = text;
+    function savePlan() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ rooms: state.rooms, furniture: state.furniture, walls: state.walls }));
+      saveStatus.textContent = '方案已保存';
+    }
+
+    function loadPlan() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        if (parsed.rooms) state.rooms = parsed.rooms;
+        if (parsed.furniture) state.furniture = parsed.furniture;
+        if (parsed.walls) state.walls = parsed.walls;
+      } catch (e) {
+        console.warn('Failed to load plan', e);
+      }
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
       toast.classList.add('show');
-      clearTimeout(showToast.t);
-      showToast.t = setTimeout(() => toast.classList.remove('show'), 1200);
+      clearTimeout(showToast.tid);
+      showToast.tid = setTimeout(() => toast.classList.remove('show'), 1300);
+    }
+
+    function showHud(text) {
+      hud.textContent = text;
+      hud.classList.add('show');
+      clearTimeout(showHud.tid);
+      showHud.tid = setTimeout(() => hud.classList.remove('show'), 700);
     }
 
     function renderLibrary() {
-      libGrid.innerHTML = LIB.map(item => `
-        <div class="item" draggable="true" data-item-id="${item.id}" tabindex="0">
+      libraryGrid.innerHTML = furnitureTemplates.map(item => `
+        <div class="item" draggable="true" data-template-id="${item.id}" tabindex="0">
           <svg viewBox="0 0 80 60" aria-label="${item.name}">
-            <rect x="8" y="15" width="64" height="30" rx="6" fill="${item.color}" stroke="#2b2824" opacity="0.8"></rect>
-            <rect x="18" y="10" width="40" height="12" fill="rgba(255,255,255,0.25)" rx="4"></rect>
+            <rect x="10" y="15" width="60" height="30" rx="6" fill="${item.color}" stroke="#2b2824" opacity="0.8"></rect>
+            <rect x="18" y="10" width="42" height="10" rx="4" fill="rgba(255,255,255,0.25)"></rect>
           </svg>
           <b>${item.name}</b>
-          <small>${item.w}×${item.h}</small>
+          <small>${item.w} × ${item.h}</small>
         </div>
       `).join('');
 
-      libGrid.querySelectorAll('.item').forEach(el => {
-        el.addEventListener('dragstart', e => {
-          e.dataTransfer.setData('text/plain', el.dataset.itemId);
-          el.classList.add('dragging');
+      libraryGrid.querySelectorAll('.item').forEach((node) => {
+        node.addEventListener('dragstart', (e) => {
+          e.dataTransfer.setData('text/plain', node.dataset.templateId);
+          node.style.opacity = '0.5';
         });
-        el.addEventListener('dragend', () => el.classList.remove('dragging'));
-        el.addEventListener('click', () => {
-          const item = LIB.find(x => x.id === el.dataset.itemId);
-          addFurniture(item.id, 220, 180, 0);
+        node.addEventListener('dragend', () => node.style.opacity = '1');
+        node.addEventListener('click', () => {
+          const template = furnitureTemplates.find(t => t.id === node.dataset.templateId);
+          if (!template) return;
+          const x = 220 + Math.random() * 150;
+          const y = 180 + Math.random() * 120;
+          addFurniture(template.id, x, y, 0);
         });
       });
     }
 
-    function renderRooms() {
-      roomList.innerHTML = state.rooms.map(room => {
-        const area = areaOfPolygon(room.polygon);
-        const selected = state.selectedRoomId === room.id ? 'on' : '';
-        return `<button type="button" class="${selected}" data-room-id="${room.id}"><span>${room.name}</span><small>${Math.round(area)} mm²</small></button>`;
+    function roomById(id) {
+      return state.rooms.find(r => r.id === id) || state.rooms[0];
+    }
+
+    function furnitureById(id) {
+      return state.furniture.find(f => f.id === id) || null;
+    }
+
+    function renderRoomList() {
+      roomListEl.innerHTML = state.rooms.map(room => {
+        const area = polygonArea(room.polygon);
+        const active = state.selectedRoom === room.id ? 'on' : '';
+        return `<button class="room-pill ${active}" data-room-id="${room.id}" type="button">
+          <span>${room.name}</span>
+          <small>${Math.round(area)} mm²</small>
+        </button>`;
       }).join('');
-      roomList.querySelectorAll('button').forEach(btn => {
+
+      roomListEl.querySelectorAll('.room-pill').forEach(btn => {
         btn.addEventListener('click', () => {
-          state.selectedRoomId = btn.dataset.roomId;
-          renderRooms();
-          updateRoomMeta();
+          state.selectedRoom = btn.dataset.roomId;
+          renderRoomList();
+          syncRoomEditor();
         });
       });
     }
 
-    function renderMats() {
-      const currentRoom = state.rooms.find(r => r.id === state.selectedRoomId) || state.rooms[0];
-      matSelect.innerHTML = MATS.map(mat => `<option value="${mat.id}" ${currentRoom.material === mat.id ? 'selected' : ''}>${mat.name}</option>`).join('');
-    }
-
-    function updateRoomMeta() {
-      const currentRoom = state.rooms.find(r => r.id === state.selectedRoomId) || state.rooms[0];
-      const area = areaOfPolygon(currentRoom.polygon);
-      roomNameInput.value = currentRoom.name;
-      roomAreaInput.value = `${Math.round(area)} mm²`;
-      matSelect.value = currentRoom.material;
-    }
-
-    function addFurniture(id, x = 220, y = 180, angle = 0) {
-      const lib = LIB.find(item => item.id === id);
-      if (!lib) return;
-      state.furniture.push({
-        id: crypto.randomUUID ? crypto.randomUUID() : `f-${Date.now()}-${Math.random().toString(16).slice(2)}`,
-        itemId: lib.id,
-        x, y, angle,
-        w: lib.w,
-        h: lib.h,
-        color: lib.color,
-        name: lib.name
+    function syncRoomEditor() {
+      const room = roomById(state.selectedRoom);
+      if (!room) return;
+      roomNameInput.value = room.name;
+      roomAreaInput.value = `${Math.round(polygonArea(room.polygon))} mm²`;
+      const material = materials.find(m => m.id === room.material) || materials[0];
+      materialGrid.innerHTML = materials.map(mat => `
+        <button class="mat-item ${room.material === mat.id ? 'on' : ''}" type="button" data-mat-id="${mat.id}">
+          <span class="mat-swatch" style="background:${mat.color};"></span>
+          <span class="mat-text">${mat.name}<small>${mat.price}¥/㎡</small></span>
+        </button>
+      `).join('');
+      materialGrid.querySelectorAll('.mat-item').forEach(btn => {
+        btn.addEventListener('click', () => {
+          room.material = btn.dataset.matId;
+          savePlan();
+          syncRoomEditor();
+          render();
+        });
       });
-      state.selectedId = state.furniture[state.furniture.length - 1].id;
+    }
+
+    function addFurniture(templateId, x, y, angle = 0) {
+      const template = furnitureTemplates.find(t => t.id === templateId);
+      if (!template) return;
+      const furniture = {
+        id: randomId('furn'),
+        templateId: template.id,
+        name: template.name,
+        w: template.w,
+        h: template.h,
+        color: template.color,
+        x, y, angle
+      };
+      state.furniture.push(furniture);
+      state.selectedId = furniture.id;
       render();
-      save();
+      savePlan();
     }
 
     function getFurnitureById(id) {
       return state.furniture.find(f => f.id === id) || null;
     }
 
-    function getScreenPoint(evt) {
+    function ptToSvg(evt) {
       const rect = svg.getBoundingClientRect();
-      const x = (evt.clientX - rect.left) / rect.width * 1000;
-      const y = (evt.clientY - rect.top) / rect.height * 760;
-      return {x, y};
+      const x = ((evt.clientX - rect.left) / rect.width) * 1000;
+      const y = ((evt.clientY - rect.top) / rect.height) * 760;
+      return { x, y };
     }
 
-    function pointInRect(x, y, rect) {
-      return x >= rect.x && x <= rect.x + rect.w && y >= rect.y && y <= rect.y + rect.h;
+    function pointInFurniture(px, py, furniture) {
+      return px >= furniture.x && px <= furniture.x + furniture.w && py >= furniture.y && py <= furniture.y + furniture.h;
     }
 
     function renderPlan() {
-      const roomsSvg = state.rooms.map(room => {
+      const roomMarkup = state.rooms.map(room => {
         const points = room.polygon.map(([x,y]) => `${x},${y}`).join(' ');
-        const roomFill = { '客厅':'#dfe6ed','卧室':'#d7c6ab','厨房':'#e2e2df','书房':'#d5c7a4','主卧':'#d5d9c9','阳台':'#dfe5df'}[room.name] || '#e8e1d9';
-        return `<polygon points="${points}" fill="${roomFill}" stroke="#a56c40" stroke-width="2" stroke-opacity="0.45" />`;
+        const fill = {
+          '客厅': '#dfe7ef',
+          '卧室': '#d8c8ab',
+          '厨房': '#e2e0dd',
+          '书房': '#d4c7a7',
+          '主卧': '#d5d8c7',
+          '阳台': '#dfe5e0'
+        }[room.name] || '#e9e0d3';
+        return `<polygon points="${points}" fill="${fill}" stroke="#9b6d49" stroke-width="2" stroke-opacity="0.5" />`;
       }).join('');
 
-      const wallSvg = state.wallSegments.map(w => `<line class="wall" x1="${w.x1}" y1="${w.y1}" x2="${w.x2}" y2="${w.y2}" stroke="#2b2824" stroke-width="6" stroke-linecap="round" opacity="0.8" />`).join('');
+      const wallMarkup = state.walls.map(w => `
+        <line x1="${w.x1}" y1="${w.y1}" x2="${w.x2}" y2="${w.y2}" stroke="#2a2725" stroke-width="5" stroke-linecap="round" opacity="0.9" />
+      `).join('');
 
-      const furnSvg = state.furniture.map(f => {
+      const furnitureMarkup = state.furniture.map((f) => {
         const cx = f.x + f.w/2;
         const cy = f.y + f.h/2;
-        const x = f.x;
-        const y = f.y;
-        const rotate = `rotate(${f.angle} ${cx} ${cy})`;
-        const selected = state.selectedId === f.id ? 'stroke="#b5653a" stroke-width="3"' : 'stroke="rgba(30,30,30,0.3)" stroke-width="1"';
-        return `<g class="furn" data-fid="${f.id}" transform="${rotate}" style="cursor:move">
-          <rect x="${x}" y="${y}" width="${f.w}" height="${f.h}" rx="8" fill="${f.color}" ${selected} />
-          <rect x="${x + 12}" y="${y + 12}" width="${Math.max(10, f.w - 24)}" height="${Math.max(10, f.h - 24)}" rx="6" fill="rgba(255,255,255,0.18)" />
-        </g>`;
+        const selected = state.selectedId === f.id ? 'stroke="#b76743" stroke-width="3"' : 'stroke="rgba(30,30,30,0.25)" stroke-width="1"';
+        return `
+          <g transform="rotate(${f.angle} ${cx} ${cy})" data-fid="${f.id}">
+            <rect x="${f.x}" y="${f.y}" width="${f.w}" height="${f.h}" rx="8" fill="${f.color}" ${selected} />
+            <rect x="${f.x + 10}" y="${f.y + 10}" width="${Math.max(8, f.w - 20)}" height="${Math.max(8, f.h - 20)}" rx="8" fill="rgba(255,255,255,0.18)" />
+          </g>
+        `;
       }).join('');
 
-      const roomLabels = state.rooms.map(room => {
-        const [cx, cy] = room.polygon.reduce(([sx,sy], [x,y]) => [sx + x, sy + y], [0,0]);
-        const count = room.polygon.length;
-        return `<text x="${cx / count}" y="${cy / count}" text-anchor="middle" font-size="18" fill="#2b2824" font-weight="600">${room.name}</text>`;
+      const labelMarkup = state.rooms.map(room => {
+        const poly = room.polygon;
+        const px = poly.reduce((sum, [x]) => sum + x, 0) / poly.length;
+        const py = poly.reduce((sum, [,y]) => sum + y, 0) / poly.length;
+        return `<text x="${px}" y="${py}" text-anchor="middle" font-size="18" fill="#2b2824" font-weight="600">${room.name}</text>`;
       }).join('');
 
-      svg.innerHTML = `${roomsSvg}${wallSvg}${furnSvg}${roomLabels}`;
+      svg.innerHTML = `${roomMarkup}${wallMarkup}${furnitureMarkup}${labelMarkup}`;
+      svg.setAttribute('class', state.tool);
 
-      svg.querySelectorAll('.furn').forEach(el => {
-        el.addEventListener('pointerdown', evt => {
-          const fid = el.getAttribute('data-fid');
-          const f = getFurnitureById(fid);
-          if (!f) return;
-          state.selectedId = fid;
-          if (state.tool !== 'select') return;
-          state.drag = { type: 'furniture', id: fid, startX: f.x, startY: f.y, clientX: evt.clientX, clientY: evt.clientY };
+      svg.querySelectorAll('g[data-fid]').forEach(group => {
+        group.addEventListener('pointerdown', (evt) => {
+          const id = group.getAttribute('data-fid');
+          const furniture = furnitureById(id);
+          if (!furniture) return;
+          state.selectedId = id;
           render();
+
+          if (state.tool !== 'select') return;
+          const p = ptToSvg(evt);
+          state.drag = {
+            id: furniture.id,
+            startX: furniture.x,
+            startY: furniture.y,
+            pointerStartX: p.x,
+            pointerStartY: p.y,
+            moveX: 0,
+            moveY: 0
+          };
         });
       });
 
-      svg.querySelectorAll('.wall').forEach(el => {
-        el.addEventListener('pointerdown', evt => {
-          if (state.tool === 'demolish') {
-            const target = evt.target;
-            const wall = state.wallSegments.find(ws => {
-              const line = `${ws.x1},${ws.y1} ${ws.x2},${ws.y2}`;
-              return line === target.getAttribute('d') || true;
-            });
-            if (!wall) return;
-            state.wallSegments = state.wallSegments.filter(w => w.id !== wall.id);
-            render();
-            save();
-          }
-        });
-      });
-
-      svg.addEventListener('pointerdown', evt => {
+      svg.onpointerdown = (evt) => {
         if (state.tool === 'measure') {
-          const p = getScreenPoint(evt);
+          const p = ptToSvg(evt);
           if (!state.pendingMeasure) {
-            state.pendingMeasure = { x: p.x, y: p.y };
-            pathInfo.textContent = `起点: ${p.x.toFixed(0)}, ${p.y.toFixed(0)}`;
+            state.pendingMeasure = { x:p.x, y:p.y };
+            measureText.textContent = `起点: ${Math.round(p.x)}, ${Math.round(p.y)}`;
             showToast('测量起点已记录');
           } else {
             const dx = p.x - state.pendingMeasure.x;
             const dy = p.y - state.pendingMeasure.y;
             const dist = Math.hypot(dx, dy);
-            pathInfo.textContent = `长度: ${Math.round(dist)} mm`;
+            measureText.textContent = `长度: ${Math.round(dist)} mm`;
             showToast(`测量结果：${Math.round(dist)} mm`);
             state.pendingMeasure = null;
           }
           return;
         }
 
-        if (state.tool === 'select' && !state.drag) {
-          const p = getScreenPoint(evt);
-          const targetF = [...state.furniture].reverse().find(f => pointInRect(p.x, p.y, {x:f.x,y:f.y,w:f.w,h:f.h}));
-          state.selectedId = targetF ? targetF.id : null;
+        if (state.tool === 'demolish') {
+          const wall = findWallNearClick(evt);
+          if (wall) {
+            state.walls = state.walls.filter(w => w.id !== wall.id);
+            savePlan();
+            render();
+            showToast('已拆除墙体');
+          }
+          return;
+        }
+
+        if (state.tool === 'select') {
+          const p = ptToSvg(evt);
+          let hit = null;
+          for (let i = state.furniture.length - 1; i >= 0; i--) {
+            const f = state.furniture[i];
+            if (pointInFurniture(p.x, p.y, f)) { hit = f; break; }
+          }
+          state.selectedId = hit ? hit.id : null;
           render();
         }
-      });
+      };
 
-      svg.addEventListener('pointermove', evt => {
+      svg.onpointermove = (evt) => {
         if (!state.drag) return;
-        const f = getFurnitureById(state.drag.id);
-        if (!f) return;
-        const p = getScreenPoint(evt);
-        const dx = p.x - (state.drag.clientX ? (state.drag.clientX - state.drag.startX) : 0);
-        if (state.drag.type === 'furniture') {
-          const cx = p.x - (state.drag.clientX - state.drag.startX);
-          f.x = Math.max(20, Math.min(960 - f.w, cx));
-          f.y = Math.max(20, Math.min(720 - f.h, p.y - (state.drag.clientY - state.drag.startY)));
-          state.drag.startX = f.x;
-          state.drag.startY = f.y;
-          state.drag.clientX = evt.clientX;
-          state.drag.clientY = evt.clientY;
-        }
-      });
+        const furniture = furnitureById(state.drag.id);
+        if (!furniture) return;
+        const p = ptToSvg(evt);
+        const dx = p.x - state.drag.pointerStartX;
+        const dy = p.y - state.drag.pointerStartY;
+        furniture.x = clamp(state.drag.startX + dx, 20, 960 - furniture.w);
+        furniture.y = clamp(state.drag.startY + dy, 20, 720 - furniture.h);
+        render();
+      };
 
-      window.addEventListener('pointerup', () => {
+      window.onpointerup = () => {
         if (state.drag) {
-          state.drag = null;
-          save();
+          savePlan();
         }
-      });
+        state.drag = null;
+      };
+
+      svg.ondragover = (e) => e.preventDefault();
+      svg.ondrop = (e) => {
+        e.preventDefault();
+        const templateId = e.dataTransfer.getData('text/plain');
+        const p = ptToSvg(e);
+        addFurniture(templateId, p.x - 60, p.y - 40, 0);
+      };
+    }
+
+    function findWallNearClick(evt) {
+      const p = ptToSvg(evt);
+      const tolerance = 12;
+      for (const wall of state.walls) {
+        const dist = distanceToSegment(p.x, p.y, wall.x1, wall.y1, wall.x2, wall.y2);
+        if (dist <= tolerance) return wall;
+      }
+      return null;
+    }
+
+    function distanceToSegment(px, py, x1, y1, x2, y2) {
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      if (dx === 0 && dy === 0) return Math.hypot(px - x1, py - y1);
+      const t = clamp(((px - x1) * dx + (py - y1) * dy) / (dx * dx + dy * dy), 0, 1);
+      const cx = x1 + t * dx;
+      const cy = y1 + t * dy;
+      return Math.hypot(px - cx, py - cy);
     }
 
     function render3D() {
-      const rooms = state.rooms.map(room => {
-        const area = areaOfPolygon(room.polygon);
-        const color = room.material ? MATS.find(m => m.id === room.material)?.color || '#d0c5b2' : '#d0c5b2';
-        return `<div class="iso-room" style="width:300px;height:240px;">
-          <div class="floor" style="background:${color};"></div>
-          <div class="label">${room.name}</div>
-          <div class="f" style="left:35px;top:90px;width:90px;height:60px;background:rgba(175,148,111,0.8);"></div>
-          <div class="bed" style="left:145px;top:50px;background:rgba(123,109,95,0.75);"></div>
-          <div class="sofa" style="left:150px;top:120px;width:120px;height:32px;background:rgba(132,136,182,0.7);"></div>
-          <div class="table" style="left:56px;top:145px;width:46px;height:46px;background:rgba(130,120,112,.75);"></div>
-          <div class="cab" style="left:210px;top:170px;width:80px;height:32px;background:rgba(110,94,88,.7);"></div>
-        </div>`;
-      }).join('');
-      view3d.innerHTML = rooms;
+      const wrap = document.getElementById('threeWrap');
+      if (!window.THREE) {
+        wrap.innerHTML = '<div style="display:grid;place-items:center;height:100%;color:#6c625b;font-size:18px;">3D 场景正在加载中…</div>';
+        return;
+      }
+
+      const existing = wrap.__sceneRoot;
+      if (existing) {
+        existing.traverse((obj) => {
+          if (obj.geometry) obj.geometry.dispose();
+          if (obj.material) {
+            if (Array.isArray(obj.material)) obj.material.forEach(m => m.dispose());
+            else obj.material.dispose();
+          }
+        });
+        existing.clear();
+      }
+
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color('#efe6d8');
+      const camera = new THREE.PerspectiveCamera(42, wrap.clientWidth / wrap.clientHeight, 0.1, 3000);
+      camera.position.set(500, 540, 780);
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(wrap.clientWidth, wrap.clientHeight);
+      wrap.innerHTML = '';
+      wrap.appendChild(renderer.domElement);
+      wrap.__sceneRoot = scene;
+
+      const ambient = new THREE.AmbientLight(0xffffff, 1.2);
+      scene.add(ambient);
+
+      const dirLight = new THREE.DirectionalLight(0xfff5d8, 1.1);
+      dirLight.position.set(180, 300, 200);
+      scene.add(dirLight);
+
+      const floor = new THREE.Mesh(
+        new THREE.BoxGeometry(980, 2, 760),
+        new THREE.MeshStandardMaterial({ color: '#efe4d3', roughness: 0.9 })
+      );
+      floor.position.set(480, -2, 380);
+      scene.add(floor);
+
+      const groundGrid = new THREE.GridHelper(1200, 25, 0xb4a189, 0xd8cbb5);
+      groundGrid.position.y = 1;
+      groundGrid.rotation.x = Math.PI/2;
+      groundGrid.position.z = 0;
+      scene.add(groundGrid);
+
+      state.rooms.forEach(room => {
+        const poly = room.polygon;
+        const xVals = poly.map(p => p[0]);
+        const yVals = poly.map(p => p[1]);
+        const minX = Math.min(...xVals);
+        const maxX = Math.max(...xVals);
+        const minY = Math.min(...yVals);
+        const maxY = Math.max(...yVals);
+        const width = maxX - minX;
+        const height = maxY - minY;
+
+        const color = materials.find(m => m.id === room.material)?.color || '#d5b78e';
+        const plane = new THREE.Mesh(
+          new THREE.BoxGeometry(width, 2, height),
+          new THREE.MeshStandardMaterial({ color, roughness: 0.85, metalness: 0.08 })
+        );
+        plane.position.set((minX + maxX) / 2, 0, (minY + maxY) / 2);
+        plane.rotation.x = 0;
+        scene.add(plane);
+
+        const wallMat = new THREE.MeshStandardMaterial({ color: '#f8f4ee', roughness: 0.8 });
+        state.walls.forEach(w => {
+          const dx = w.x2 - w.x1, dy = w.y2 - w.y1;
+          const len = Math.hypot(dx, dy);
+          const wallMesh = new THREE.Mesh(new THREE.BoxGeometry(len, 24, 6), wallMat);
+          wallMesh.position.set((w.x1 + w.x2) / 2, 12, (w.y1 + w.y2) / 2);
+          const angle = Math.atan2(dy, dx);
+          wallMesh.rotation.y = -angle;
+          wallMesh.rotation.x = 0;
+          scene.add(wallMesh);
+        });
+      });
+
+      state.furniture.forEach((furniture) => {
+        const mesh = new THREE.Mesh(
+          new THREE.BoxGeometry(furniture.w, 30, furniture.h),
+          new THREE.MeshStandardMaterial({ color: furniture.color, roughness: 0.8 })
+        );
+        mesh.position.set(furniture.x + furniture.w / 2, 15, furniture.y + furniture.h / 2);
+        mesh.rotation.y = -((furniture.angle || 0) * Math.PI / 180);
+        scene.add(mesh);
+      });
+
+      const controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.enablePan = true;
+      controls.enableZoom = true;
+      controls.target.set(480, 0, 380);
+      controls.update();
+
+      function animate() {
+        requestAnimationFrame(animate);
+        controls.update();
+        renderer.render(scene, camera);
+      }
+      animate();
+    }
+
+    function renderStats() {
+      const totalArea = state.rooms.reduce((sum, room) => sum + polygonArea(room.polygon), 0);
+      const usedArea = state.furniture.reduce((sum, item) => sum + item.w * item.h, 0);
+      const cost = state.rooms.reduce((sum, room) => {
+        const mat = materials.find(m => m.id === room.material) || materials[0];
+        return sum + (polygonArea(room.polygon) / 10000) * mat.price * 1.05;
+      }, 0);
+
+      areaTotal.textContent = `${Math.round(totalArea / 10000)}㎡`;
+      areaUsed.textContent = `${Math.round(usedArea / 10000)}㎡`;
+      furnitureCount.textContent = `${state.furniture.length}`;
+      budgetTotal.textContent = `¥${Math.round(cost)}`;
     }
 
     function render() {
       renderPlan();
-      renderRooms();
-      renderMats();
-      updateRoomMeta();
-      render3D();
-      updateStats();
-      const currentRoom = state.rooms.find(r => r.id === state.selectedRoomId) || state.rooms[0];
-      if (state.selectedId) {
-        const f = getFurnitureById(state.selectedId);
-        fabName.textContent = f ? f.name : currentRoom.name;
-        fab.classList.add('show');
-      } else {
-        fab.classList.remove('show');
-      }
-      const selectedTool = state.tool;
-      const toolLabels = { select: '选择模式', measure: '测量模式', demolish: '拆改模式' };
-      modeHint.textContent = toolLabels[selectedTool] || '选择模式';
-      modeHint.classList.add('show');
-      clearTimeout(render.t); render.t = setTimeout(() => modeHint.classList.remove('show'), 900);
-      document.body.classList.toggle('m3d', document.body.dataset.view === '3d');
+      renderRoomList();
+      syncRoomEditor();
+      renderStats();
+
+      const selectedFurniture = state.selectedId ? furnitureById(state.selectedId) : null;
+      fabName.textContent = selectedFurniture ? selectedFurniture.name : (state.selectedRoom || '房间');
+      fab.classList.toggle('show', !!selectedFurniture);
+
+      const toolLabels = {
+        select: '选择模式',
+        measure: '测量模式',
+        demolish: '拆改模式'
+      };
+      showHud(toolLabels[state.tool] || '选择模式');
+
+      document.body.classList.toggle('view-3d', state.view === '3d');
       document.querySelectorAll('[data-tool]').forEach(btn => {
         btn.classList.toggle('on', btn.dataset.tool === state.tool);
       });
-      document.querySelectorAll('[data-lang]').forEach(btn => {
-        btn.classList.toggle('on', btn.dataset.lang === state.language);
-      });
       document.querySelectorAll('[data-view]').forEach(btn => {
-        btn.classList.toggle('on', btn.dataset.view === (document.body.dataset.view || '2d'));
+        btn.classList.toggle('on', btn.dataset.view === state.view);
+      });
+      document.querySelectorAll('[data-lang]').forEach(btn => {
+        btn.classList.toggle('on', btn.dataset.lang === 'zh');
+      });
+
+      if (state.view === '3d') {
+        render3D();
+      }
+    }
+
+    function applyRoomChanges() {
+      const room = roomById(state.selectedRoom);
+      if (!room) return;
+      room.name = roomNameInput.value.trim() || room.name;
+      if (state.rooms.some(r => r.id !== room.id && r.name === room.name)) {
+        room.name = `${room.name} 1`;
+      }
+      state.selectedRoom = room.name;
+      roomListEl.innerHTML = '';
+      render();
+      savePlan();
+      showToast('房间已更新');
+    }
+
+    function exportPlan() {
+      const payload = { rooms: state.rooms, furniture: state.furniture, walls: state.walls };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'plan.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('方案已导出');
+    }
+
+    function importPlan() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'application/json';
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          try {
+            const data = JSON.parse(String(ev.target.result || '{}'));
+            if (data.rooms) state.rooms = data.rooms;
+            if (data.furniture) state.furniture = data.furniture;
+            if (data.walls) state.walls = data.walls;
+            state.selectedRoom = state.rooms[0].id;
+            savePlan();
+            render();
+            showToast('方案已导入');
+          } catch (err) {
+            showToast('JSON 无效');
+          }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    }
+
+    function addKeyBindings() {
+      document.addEventListener('keydown', (evt) => {
+        const key = evt.key.toLowerCase();
+        if (evt.key === 'Delete' || evt.key === 'Backspace') {
+          if (state.selectedId) {
+            state.furniture = state.furniture.filter(f => f.id !== state.selectedId);
+            state.selectedId = null;
+            render();
+            savePlan();
+          }
+        }
+        if ((evt.ctrlKey || evt.metaKey) && key === 'd') {
+          evt.preventDefault();
+          if (!state.selectedId) return;
+          const f = furnitureById(state.selectedId);
+          if (!f) return;
+          state.furniture.push({ ...f, id: randomId('copy'), x: f.x + 22, y: f.y + 22 });
+          state.selectedId = state.furniture[state.furniture.length - 1].id;
+          render();
+          savePlan();
+        }
+        if ((evt.ctrlKey || evt.metaKey) && key === 'z') {
+          showToast('撤销已恢复');
+        }
+        if (key === 'v') state.tool = 'select';
+        if (key === 'm') state.tool = 'measure';
+        if (key === 'x') state.tool = 'demolish';
+        if (key === 'r') {
+          if (!state.selectedId) return;
+          const f = furnitureById(state.selectedId);
+          if (!f) return;
+          f.angle = (f.angle || 0) + 90;
+          render();
+          savePlan();
+        }
+        render();
       });
     }
 
-    function updateStats() {
-      const totalArea = state.rooms.reduce((sum, room) => sum + areaOfPolygon(room.polygon), 0);
-      let used = 0;
-      state.furniture.forEach(f => used += f.w * f.h);
-      let cost = 0;
-      state.rooms.forEach(room => {
-        const mat = MATS.find(m => m.id === room.material) || MATS[0];
-        cost += areaOfPolygon(room.polygon) / 10000 * mat.price * 1.05;
-      });
-      statArea.textContent = `${Math.round(totalArea)}m²`;
-      statUse.textContent = `${Math.round(used / 10000)}m²`;
-      statFurn.textContent = `${state.furniture.length}`;
-      statCost.textContent = `¥${Math.round(cost)}`;
-    }
-
-    function attachEvents() {
+    function bindControls() {
       document.querySelectorAll('[data-tool]').forEach(btn => {
         btn.addEventListener('click', () => {
           state.tool = btn.dataset.tool;
@@ -608,28 +910,28 @@
         });
       });
 
-      document.querySelectorAll('[data-lang]').forEach(btn => {
+      document.querySelectorAll('[data-view]').forEach(btn => {
         btn.addEventListener('click', () => {
-          state.language = btn.dataset.lang;
+          state.view = btn.dataset.view;
           render();
-          save();
         });
       });
 
-      document.querySelectorAll('[data-view]').forEach(btn => {
+      document.querySelectorAll('[data-lang]').forEach(btn => {
         btn.addEventListener('click', () => {
-          const value = btn.dataset.view;
-          document.body.dataset.view = value;
-          document.body.classList.toggle('m3d', value === '3d');
-          render();
+          // language toggle kept for UI compatibility, no translated strings required
+          btn.classList.add('on');
+          document.querySelectorAll('[data-lang]').forEach(el => {
+            if (el !== btn) el.classList.remove('on');
+          });
         });
       });
 
       document.getElementById('newPlanBtn').addEventListener('click', () => {
         state.furniture = [];
-        state.wallSegments = [];
+        state.walls = [];
         state.selectedId = null;
-        save();
+        savePlan();
         render();
       });
 
@@ -637,118 +939,46 @@
         if (!state.selectedId) return;
         state.furniture = state.furniture.filter(f => f.id !== state.selectedId);
         state.selectedId = null;
+        savePlan();
         render();
-        save();
       });
 
-      document.getElementById('dupBtn').addEventListener('click', () => {
+      document.getElementById('copyBtn').addEventListener('click', () => {
         if (!state.selectedId) return;
-        const f = getFurnitureById(state.selectedId);
+        const f = furnitureById(state.selectedId);
         if (!f) return;
-        state.furniture.push({ ...f, id: crypto.randomUUID ? crypto.randomUUID() : `dup-${Date.now()}`, x: f.x + 30, y: f.y + 30 });
-        state.selectedId = state.furniture[state.furniture.length - 1].id;
+        const copy = { ...f, id: randomId('copy'), x: f.x + 20, y: f.y + 20 };
+        state.furniture.push(copy);
+        state.selectedId = copy.id;
         render();
-        save();
+        savePlan();
       });
 
       document.getElementById('rotateBtn').addEventListener('click', () => {
         if (!state.selectedId) return;
-        const f = getFurnitureById(state.selectedId);
+        const f = furnitureById(state.selectedId);
+        if (!f) return;
         f.angle = (f.angle || 0) + 90;
-        render();
-        save();
-      });
-
-      document.getElementById('applyRoomBtn').addEventListener('click', () => {
-        const room = state.rooms.find(r => r.id === state.selectedRoomId);
-        if (!room) return;
-        room.name = roomNameInput.value || room.name;
-        room.material = matSelect.value;
-        render();
-        save();
-      });
-
-      document.getElementById('exportBtn').addEventListener('click', () => {
-        const json = JSON.stringify({ rooms: state.rooms, furniture: state.furniture, mats: MATS }, null, 2);
-        const a = document.createElement('a');
-        a.href = `data:application/json;charset=utf-8,${encodeURIComponent(json)}`;
-        a.download = 'plan.json';
-        a.click();
-        showToast('方案已导出');
-      });
-
-      document.getElementById('importBtn').addEventListener('click', () => {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'application/json';
-        input.onchange = e => {
-          const file = e.target.files[0];
-          if (!file) return;
-          const reader = new FileReader();
-          reader.onload = ev => {
-            try {
-              const data = JSON.parse(ev.target.result);
-              if (data.furniture) state.furniture = data.furniture;
-              if (data.rooms) state.rooms = data.rooms;
-              render();
-              save();
-              showToast('方案已导入');
-            } catch (err) {
-              showToast('导入失败：JSON 格式无效');
-            }
-          };
-          reader.readAsText(file);
-        };
-        input.click();
-      });
-
-      window.addEventListener('keydown', evt => {
-        if (evt.key === 'Delete' || evt.key === 'Backspace') {
-          if (state.selectedId) {
-            state.furniture = state.furniture.filter(f => f.id !== state.selectedId);
-            state.selectedId = null;
-            render();
-            save();
-          }
-        }
-        if ((evt.ctrlKey || evt.metaKey) && evt.key.toLowerCase() === 'd') {
-          evt.preventDefault();
-          document.getElementById('dupBtn').click();
-        }
-        if ((evt.ctrlKey || evt.metaKey) && evt.key.toLowerCase() === 'z') {
-          evt.preventDefault();
-          showToast('已恢复到上一步');
-        }
-        if (evt.key.toLowerCase() === 'v') state.tool = 'select';
-        if (evt.key.toLowerCase() === 'm') state.tool = 'measure';
-        if (evt.key.toLowerCase() === 'x') state.tool = 'demolish';
-        if (evt.key.toLowerCase() === 'r') {
-          if (!state.selectedId) return;
-          const f = getFurnitureById(state.selectedId);
-          f.angle = (f.angle || 0) + 90;
-          render();
-          save();
-        }
+        savePlan();
         render();
       });
 
-      svg.addEventListener('dragover', evt => {
-        evt.preventDefault();
-      });
-
-      svg.addEventListener('drop', evt => {
-        evt.preventDefault();
-        const itemId = evt.dataTransfer.getData('text/plain');
-        const point = getScreenPoint(evt);
-        addFurniture(itemId, point.x - 50, point.y - 30, 0);
-      });
+      document.getElementById('applyRoomBtn').addEventListener('click', applyRoomChanges);
+      document.getElementById('exportBtn').addEventListener('click', exportPlan);
+      document.getElementById('importBtn').addEventListener('click', importPlan);
     }
 
-    renderLibrary();
-    load();
-    attachEvents();
-    render();
-    save();
+    function init() {
+      loadPlan();
+      renderLibrary();
+      bindControls();
+      addKeyBindings();
+      state.selectedRoom = state.rooms[0].id;
+      render();
+      savePlan();
+    }
+
+    init();
   </script>
 </body>
 </html>
